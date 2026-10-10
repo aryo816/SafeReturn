@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeReturn - Campus Lost & Found System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #234CFA;
+      --primary-blue-light: #EFF2FF;
+      --text-primary: #111827;
+      --text-heading: #171715;
+      --text-secondary: #6B7280;
+      --border: #E5E7EB;
+      --surface-card: #F7F8FA;
+      --surface-alt: #F4F2EA;
+      --status-green: #16A34A;
+      --status-green-bg: #DCFCE7;
+      --status-teal: #0F766E;
+      --status-teal-bg: #CCFBF1;
+      --status-orange: #D97706;
+      --status-orange-bg: #FEF3C7;
+      --status-red: #DC2626;
+      --status-red-bg: #FEE2E2;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #0F172A;
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* Top Control Bar */
+    .top-toolbar {
+      background: #1E293B;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      max-width: 900px;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .role-badges {
+      display: flex;
+      gap: 8px;
+    }
+
+    .role-btn {
+      background: #334155;
+      color: #94A3B8;
+      border: 1px solid #475569;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .role-btn.active {
+      background: var(--primary-blue);
+      color: #fff;
+      border-color: var(--primary-blue);
+    }
+
+    /* Phone Shell (Exact 402px matching Figma iPhone 17 Frame) */
+    .device-shell {
+      width: 402px;
+      height: 874px;
+      background: #FFFFFF;
+      border-radius: 48px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4), 0 0 0 12px #1E293B;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+      background: #FFFFFF;
+      position: relative;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* Header Bar */
+    .app-header {
+      padding: 18px 24px 12px;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .app-header .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .app-header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-heading);
+    }
+
+    .app-header p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text-heading);
+      padding: 4px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Screen Content */
+    .content-pad {
+      padding: 20px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Typography */
+    .title-h1 { font-size: 24px; font-weight: 700; color: var(--text-heading); line-height: 1.25; }
+    .title-h2 { font-size: 18px; font-weight: 700; color: var(--text-heading); margin-bottom: 12px; }
+    .body-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-top: 8px; }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary-blue);
+      color: white;
+    }
+    .btn-primary:hover { opacity: 0.95; }
+
+    .btn-outlined {
+      background: transparent;
+      color: var(--primary-blue);
+      border: 1.5px solid var(--primary-blue);
+    }
+
+    .btn-muted {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--status-red);
+      border: 1.5px solid var(--status-red);
+    }
+
+    /* Status Badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-reported { background: var(--status-orange-bg); color: var(--status-orange); }
+    .badge-stored { background: var(--status-teal-bg); color: var(--status-teal); }
+    .badge-matched { background: var(--status-teal-bg); color: var(--status-teal); }
+    .badge-approved { background: var(--status-green-bg); color: var(--status-green); }
+    .badge-danger { background: var(--status-red-bg); color: var(--status-red); }
+
+    /* Card Containers */
+    .card {
+      background: var(--surface-card);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid #EEF0F2;
+    }
+
+    .item-card {
+      background: #FFFFFF;
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .item-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .item-thumb {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      background: #E2E8F0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .item-thumb.brown-wallet {
+      background: #8A6047;
+      color: white;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #F1F3F5;
+      font-size: 13px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label { color: var(--text-secondary); }
+    .info-row .val { font-weight: 500; color: var(--text-heading); text-align: right; }
+
+    /* Notice & Security Boxes */
+    .notice-box {
+      background: var(--surface-card);
+      border-radius: 14px;
+      padding: 14px;
+      margin: 16px 0;
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text-secondary);
+    }
+    .security-staff-box {
+      background: #FFFFFF;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin: 16px 0;
+    }
+    .security-staff-box .sec-title {
+      color: var(--primary-blue);
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    /* Stepper */
+    .stepper-container {
+      display: flex;
+      gap: 8px;
+      margin: 12px 0 16px;
+    }
+    .step-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+    .step-bar.active { background: var(--primary-blue); }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-heading);
+      margin-bottom: 6px;
+      display: block;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 0 14px;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+    }
+    .form-textarea {
+      height: 80px;
+      padding: 12px 14px;
+      resize: none;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--primary-blue);
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      height: 72px;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 8px 12px;
+      border-radius: 20px;
+    }
+    .nav-item.active {
+      color: var(--primary-blue);
+      font-weight: 700;
+    }
+    .nav-item.active .nav-icon {
+      background: var(--primary-blue-light);
+      color: var(--primary-blue);
+      border-radius: 12px;
+      padding: 4px 14px;
+    }
+
+    /* QR Container */
+    .qr-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin: 16px 0;
+    }
+    .qr-box {
+      width: 180px;
+      height: 180px;
+      background: #111827;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-family: monospace;
+      font-size: 11px;
+      padding: 12px;
+      text-align: center;
+      margin-bottom: 12px;
+      background-image: repeating-linear-gradient(0deg, #111 0px, #111 10px, #fff 10px, #fff 20px);
+      position: relative;
+    }
+    .qr-box-inner {
+      background: #fff;
+      color: #111;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      border: 4px solid #111;
+    }
+
+    /* Bottom Modal Sheet */
+    .sheet-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 50;
+      display: none;
+      align-items: flex-end;
+    }
+    .sheet-overlay.active { display: flex; }
+    .sheet-content {
+      background: #fff;
+      border-radius: 24px 24px 0 0;
+      width: 100%;
+      padding: 24px;
+      animation: slideUp 0.25s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .home-indicator {
+      width: 134px;
+      height: 5px;
+      background: #111827;
+      border-radius: 3px;
+      margin: 10px auto 6px;
+      flex-shrink: 0;
+    }
+
+    /* ===== Tambahan dari desain SVG: Lost Report, Submit a Claim, Collection Ticket ===== */
+    .back-btn svg { width: 24px; height: 24px; display: block; }
+    .btn-soft {
+      background: var(--surface-alt);
+      color: var(--primary-blue);
+      border: 1.5px solid var(--primary-blue);
+    }
+    .btn-soft:hover { opacity: .95; }
+
+    .step-labels { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); margin: -8px 0 12px; }
+    .step-labels .current { color: var(--status-orange); font-weight: 700; }
+    .step-count { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
+
+    .field { margin-bottom: 16px; }
+    .field-label { display: block; font-size: 14px; font-weight: 500; color: var(--text-heading); margin-bottom: 8px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field-input, .field-select, .field-area {
+      width: 100%; border-radius: 12px; border: 1px solid var(--border);
+      background: #fff; color: var(--text-primary); font-size: 14px; outline: none;
+    }
+    .field-input, .field-select { height: 48px; padding: 0 14px; }
+    .field-area { min-height: 80px; padding: 12px 14px; resize: none; line-height: 1.4; }
+    .field-area.tall { min-height: 72px; }
+    .field-input:focus, .field-select:focus, .field-area:focus { border-color: var(--primary-blue); }
+    .field-area::placeholder { color: var(--text-secondary); }
+    .field-select {
+      appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 36px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+    }
+    .photo-drop {
+      width: 100%; height: 86px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--surface-card); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 6px; cursor: pointer;
+      font-size: 14px; color: var(--text-primary);
+    }
+    .photo-drop:hover { background: #F1F3F6; }
+    .photo-drop svg { width: 20px; height: 20px; color: var(--primary-blue); }
+
+    .claim-item { display: flex; align-items: center; gap: 16px; background: var(--surface-card); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+    .claim-item svg { width: 28px; height: 28px; color: var(--status-orange); flex-shrink: 0; }
+    .claim-item .ci-title { font-size: 15px; font-weight: 700; color: var(--text-heading); }
+    .claim-item .ci-sub { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .section-title { font-size: 18px; font-weight: 700; color: var(--text-heading); margin-bottom: 16px; }
+    .info-note { display: flex; gap: 12px; align-items: flex-start; background: var(--surface-card); border-radius: 12px; padding: 16px; font-size: 13px; line-height: 1.5; color: var(--text-secondary); margin: 4px 0 20px; }
+    .info-note svg { width: 22px; height: 22px; flex-shrink: 0; }
+
+    .ticket-head { text-align: center; }
+    .badge-ticket { display: inline-block; background: var(--surface-card); color: var(--status-green); font-size: 13px; font-weight: 500; padding: 5px 14px; border-radius: 999px; }
+    .ticket-title { font-size: 18px; font-weight: 700; color: var(--text-heading); margin: 12px 0 8px; }
+    .ticket-ref { font-size: 13px; color: var(--text-secondary); }
+    .qr-frame { width: 181px; height: 181px; margin: 16px auto; border: 1px solid var(--border); border-radius: 12px; background: #fff; display: grid; place-items: center; }
+    .qr-frame svg { width: 181px; height: 181px; display: block; }
+    .ticket-card { background: var(--surface-card); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+    .ticket-row { display: grid; grid-template-columns: 110px 1fr; font-size: 14px; padding: 7px 0; }
+    .ticket-row .k { color: var(--text-secondary); }
+    .ticket-row .v { color: var(--text-primary); }
+    .ticket-note { font-size: 12px; line-height: 1.5; color: var(--text-secondary); margin-top: 6px; }
+    .id-card-note { display: flex; gap: 12px; align-items: flex-start; background: var(--surface-card); border-radius: 12px; padding: 16px; font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
+    .id-card-note svg { width: 22px; height: 22px; flex-shrink: 0; color: var(--primary-blue); }
+
+    /* ===== Security Profile ===== */
+    .sec-profile-card { display: flex; align-items: center; gap: 16px; background: var(--surface-card); border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+    .sec-avatar { width: 50px; height: 50px; border-radius: 50%; background: #fff; border: 1px solid var(--border); display: grid; place-items: center; color: var(--status-teal); font-size: 20px; font-weight: 700; flex-shrink: 0; }
+    .sec-profile-card .sp-name { font-size: 16px; font-weight: 700; color: var(--text-heading); }
+    .role-pill { display: inline-block; background: #fff; color: var(--status-teal); font-size: 13px; padding: 4px 12px; border-radius: 999px; margin: 6px 0 4px; }
+    .sec-profile-card .sp-post { font-size: 13px; color: var(--text-secondary); }
+    .officer-info { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 0 16px; margin-bottom: 16px; }
+    .officer-field { padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .officer-field:last-child { border-bottom: none; }
+    .officer-field .of-label { font-size: 13px; color: var(--text-secondary); }
+    .officer-field .of-value { font-size: 16px; color: var(--text-primary); margin-top: 4px; }
+    .officer-field .of-value.muted { font-size: 14px; color: var(--text-secondary); }
+    .btn-signout { background: #fff; color: var(--status-teal); border: 1px solid var(--border); font-weight: 400; }
+    .btn-signout:hover { background: var(--surface-card); }
+    .sec-footer { margin-top: auto; text-align: center; padding: 24px 0 8px; font-size: 13px; color: var(--text-secondary); }
+    .sec-footer strong { display: block; color: var(--status-teal); font-weight: 600; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Tool Bar for Interactive Role Switching & Scenario Verification -->
+  <div class="top-toolbar">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <strong style="color:#60A5FA;">SafeReturn Live Tester</strong>
+      <span style="font-size:12px; color:#94A3B8;">(Stage 1-6 UI & Business Logic)</span>
+    </div>
+    <div class="role-badges">
+      <button class="role-btn active" onclick="switchRole('guest')">Guest</button>
+      <button class="role-btn" onclick="switchRole('user')">User (Mahasiswa)</button>
+      <button class="role-btn" onclick="switchRole('guard')">Guard (Satpam)</button>
+      <button class="role-btn" onclick="switchRole('supervisor')">Supervisor</button>
+    </div>
+  </div>
+
+  <!-- Mobile Screen Shell -->
+  <div class="device-shell">
+
+    <!-- ================= SCREEN: SIGN IN (00) ================= -->
+    <div id="screen-signin" class="screen active">
+      <div class="app-header">
+        <div>
+          <h1>Sign In</h1>
+          <p>Campus Lost and Found</p>
+        </div>
+      </div>
+      <div class="content-pad" style="justify-content:center;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <div style="width:36px; height:36px; background:var(--primary-blue); border-radius:12px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">SR</div>
+          <span style="font-size:22px; font-weight:800; color:var(--text-heading);">Safe<span style="color:#D97706;">Return</span></span>
+        </div>
+        <h2 class="title-h1" style="margin-bottom:8px;">Recover what matters.</h2>
+        <p class="body-desc" style="margin-bottom:24px;">Report found items, search for lost belongings, and collect them after security verification.</p>
+
+        <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:24px;">
+          <div style="display:flex; align-items:center; gap:12px; font-size:14px; font-weight:500;">
+            <span style="color:#D97706;">📦</span> Report Found Items
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; font-size:14px; font-weight:500;">
+            <span style="color:#D97706;">🔍</span> Browse Stored Items
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; font-size:14px; font-weight:500;">
+            <span style="color:#D97706;">🛡️</span> Claims Reviewed by Security
+          </div>
+        </div>
+
+        <div class="notice-box">
+          <span style="color:#DC2626; font-size:16px;">ⓘ</span>
+          <span>Guests can only report found items. Sign in with campus SSO to browse items, report losses, and submit claims.</span>
+        </div>
+
+        <div style="margin-top:auto; display:flex; flex-direction:column; gap:12px;">
+          <button class="btn btn-primary" onclick="showScreen('screen-user-home')">Sign In with Campus SSO</button>
+          <button class="btn btn-muted" onclick="showScreen('screen-found-step1')">Continue as Guest</button>
+          <p style="text-align:center; font-size:11px; color:var(--text-secondary); margin-top:4px;">SSO sign-in demo · sample interface</p>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: USER HOME (01) ================= -->
+    <div id="screen-user-home" class="screen">
+      <div class="app-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:32px; height:32px; background:var(--primary-blue); border-radius:10px; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:bold;">SR</div>
+          <span style="font-size:18px; font-weight:800; color:var(--text-heading);">Safe<span style="color:#D97706;">Return</span></span>
+        </div>
+        <div style="width:36px; height:36px; background:#D97706; border-radius:10px; display:flex; align-items:center; justify-content:center; color:white;">🔔</div>
+      </div>
+      <div class="content-pad">
+        <h1 class="title-h1" style="color:var(--primary-blue);">Welcome, Naya</h1>
+        <p class="body-desc" style="margin-bottom:20px;">Report lost or found items securely and track their progress.</p>
+
+        <h2 class="title-h2">Quick Actions</h2>
+        <div class="item-card" onclick="showScreen('screen-found-step1')">
+          <div class="item-thumb" style="background:#FFF7ED; color:#EA580C; font-size:24px;">📦</div>
+          <div style="flex:1;">
+            <div style="font-weight:700; font-size:15px;">Report a Found Item</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">Report an item found on campus to help locate its owner.</div>
+          </div>
+          <div style="color:var(--text-secondary); font-size:18px;">›</div>
+        </div>
+
+        <div class="item-card" onclick="showScreen('screen-lost-form')">
+          <div class="item-thumb" style="background:#FFF7ED; color:#EA580C; font-size:24px;">🔍</div>
+          <div style="flex:1;">
+            <div style="font-weight:700; font-size:15px;">Report a Lost Item</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">Submit a lost-item report to help security staff identify a match.</div>
+          </div>
+          <div style="color:var(--text-secondary); font-size:18px;">›</div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:16px 0 10px;">
+          <h2 class="title-h2" style="margin-bottom:0;">My Reports</h2>
+          <span style="font-size:13px; font-weight:600; color:var(--primary-blue); cursor:pointer;">View All</span>
+        </div>
+
+        <div class="item-card" style="flex-direction:column; align-items:stretch; gap:10px;" onclick="showScreen('screen-collection-ticket')">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span>📦</span>
+              <span style="font-size:13px; font-weight:700; color:var(--primary-blue);">Found Item</span>
+            </div>
+            <span class="badge badge-approved" id="user-brown-wallet-badge">Claim Approved</span>
+          </div>
+          <div>
+            <div style="font-weight:700; font-size:15px;">Brown Wallet</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">Found outside the Central Library at 12:45 WIB</div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #F1F3F5; padding-top:8px;">
+            <span style="font-size:12px; color:var(--text-secondary);">SR-20261009-1024</span>
+            <button class="btn btn-muted" style="height:32px; width:auto; padding:0 14px; font-size:12px;">View Details</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Nav (User) -->
+      <div class="bottom-nav">
+        <button class="nav-item active" onclick="showScreen('screen-user-home')">
+          <span class="nav-icon">🏠</span>
+          <span>Home</span>
+        </button>
+        <button class="nav-item" onclick="showScreen('screen-catalog')">
+          <span class="nav-icon">📦</span>
+          <span>Found Items</span>
+        </button>
+        <button class="nav-item" onclick="showScreen('screen-user-profile')">
+          <span class="nav-icon">👤</span>
+          <span>Account</span>
+        </button>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: REPORT FOUND ITEM (STEP 1 - PHOTO) ================= -->
+    <div id="screen-found-step1" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-signin')">←</button>
+          <div>
+            <h1>Report a Found Item</h1>
+            <p>Enter the details of the item you found</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="stepper-container">
+          <div class="step-bar active"></div>
+          <div class="step-bar"></div>
+          <div class="step-bar"></div>
+        </div>
+        <div style="font-size:12px; color:#EA580C; font-weight:600; margin-bottom:12px;">Photo · Step 1 of 3</div>
+
+        <div style="border:2px dashed var(--border); border-radius:16px; padding:40px 20px; text-align:center; background:#F8FAFC; margin-bottom:16px;">
+          <div style="font-size:36px; margin-bottom:8px;">📷</div>
+          <div style="font-weight:700; font-size:15px; margin-bottom:4px;">Take a Photo of Found Item</div>
+          <p style="font-size:12px; color:var(--text-secondary);">Ensure the item is clearly visible.</p>
+        </div>
+
+        <div style="margin-top:auto; display:flex; flex-direction:column; gap:12px;">
+          <button class="btn btn-primary" onclick="showScreen('screen-found-step2')">Upload Photo & Continue</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: REPORT FOUND ITEM (STEP 2 - DETAILS) ================= -->
+    <div id="screen-found-step2" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-found-step1')">←</button>
+          <div>
+            <h1>Report a Found Item</h1>
+            <p>Enter the details of the item you found</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="stepper-container">
+          <div class="step-bar active"></div>
+          <div class="step-bar active"></div>
+          <div class="step-bar"></div>
+        </div>
+        <div style="font-size:12px; color:#EA580C; font-weight:600; margin-bottom:12px;">Details · Step 2 of 3</div>
+
+        <div style="width:100%; height:120px; border-radius:14px; background:#8A6047; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; margin-bottom:8px;">
+          Photo uploaded successfully
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="found-cat">
+            <option>Wallet</option>
+            <option>Electronics</option>
+            <option>Umbrella</option>
+            <option>Keys</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Color</label>
+          <select class="form-select" id="found-color">
+            <option>Brown</option>
+            <option>Black</option>
+            <option>Blue</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Campus Location</label>
+          <select class="form-select" id="found-loc">
+            <option>Central Library</option>
+            <option>Building A</option>
+            <option>Campus Cafeteria</option>
+          </select>
+        </div>
+
+        <div style="display:flex; gap:12px;">
+          <div class="form-group" style="flex:1;">
+            <label class="form-label">Date</label>
+            <input class="form-input" value="9 Oct 2026">
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label class="form-label">Time</label>
+            <input class="form-input" value="09:15 WIB">
+          </div>
+        </div>
+
+        <div style="margin-top:auto; display:flex; flex-direction:column; gap:10px;">
+          <button class="btn btn-primary" onclick="showScreen('screen-found-qr')">Continue to QR Code</button>
+          <button class="btn btn-muted" onclick="showScreen('screen-found-step1')">Back to Photo</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: REPORT FOUND ITEM (STEP 3 - CASE QR) ================= -->
+    <div id="screen-found-qr" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-found-step2')">←</button>
+          <div>
+            <h1>Found-Item QR Code</h1>
+            <p>Report recorded. Security has not yet received the item.</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad" style="align-items:center; text-align:center;">
+        <div class="stepper-container" style="width:100%;">
+          <div class="step-bar active"></div>
+          <div class="step-bar active"></div>
+          <div class="step-bar active"></div>
+        </div>
+        <div style="font-size:12px; color:#EA580C; font-weight:600; margin-bottom:12px; width:100%; text-align:left;">QR Code · Step 3 of 3</div>
+
+        <span class="badge badge-reported" style="margin-bottom:8px;">Reported</span>
+        <h2 style="font-size:18px; font-weight:800; margin-bottom:4px;">SR-20261009-1024</h2>
+        <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">Wallet · Brown</p>
+
+        <div class="qr-card" style="width:100%;">
+          <div class="qr-box">
+            <div class="qr-box-inner">
+              [CASE QR CODE]<br>SR-20261009-1024
+            </div>
+          </div>
+          <span style="font-size:12px; color:var(--text-secondary);">Case QR contains only: SR-20261009-1024</span>
+        </div>
+
+        <div class="notice-box" style="text-align:left;">
+          <span style="font-size:20px; color:var(--primary-blue);">📦</span>
+          <div>
+            <strong style="color:var(--text-heading); font-size:13px;">Deliver to the Security Post</strong>
+            <p style="margin-top:2px;">Bring the found item to the campus security post and show the case QR code.</p>
+          </div>
+        </div>
+
+        <div style="margin-top:auto; width:100%;">
+          <button class="btn btn-primary" onclick="showScreen('screen-user-home')">Back to Home</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: CATALOG (FOUND ITEMS) ================= -->
+    <div id="screen-catalog" class="screen">
+      <div class="app-header">
+        <div>
+          <h1>Found Items</h1>
+          <p>Find your belongings on campus</p>
+        </div>
+      </div>
+      <div class="content-pad">
+        <input class="form-input" placeholder="Search by category or location..." style="margin-bottom:14px;">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span style="font-size:12px; color:var(--text-secondary);">4 items · identifying details are hidden</span>
+        </div>
+
+        <div class="item-card" onclick="showScreen('screen-item-detail')">
+          <div class="item-thumb brown-wallet">Wallet</div>
+          <div style="flex:1;">
+            <div style="font-weight:700; font-size:15px;">Wallet</div>
+            <div style="font-size:12px; color:var(--text-secondary);">Central Library</div>
+            <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">8 Oct 2026</div>
+          </div>
+          <span class="badge badge-stored">Stored</span>
+        </div>
+
+        <div class="item-card">
+          <div class="item-thumb" style="background:#E2E8F0;">Bottle</div>
+          <div style="flex:1;">
+            <div style="font-weight:700; font-size:15px;">Bottle</div>
+            <div style="font-size:12px; color:var(--text-secondary);">Building A</div>
+            <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">8 Oct 2026</div>
+          </div>
+          <span class="badge badge-stored">Stored</span>
+        </div>
+
+        <div class="item-card">
+          <div class="item-thumb" style="background:#E2E8F0;">Umbrella</div>
+          <div style="flex:1;">
+            <div style="font-weight:700; font-size:15px;">Blue Umbrella</div>
+            <div style="font-size:12px; color:var(--text-secondary);">Campus Cafeteria</div>
+            <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">7 Oct 2026</div>
+          </div>
+          <span class="badge badge-stored">Stored</span>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="nav-item" onclick="showScreen('screen-user-home')">
+          <span class="nav-icon">🏠</span>
+          <span>Home</span>
+        </button>
+        <button class="nav-item active" onclick="showScreen('screen-catalog')">
+          <span class="nav-icon">📦</span>
+          <span>Found Items</span>
+        </button>
+        <button class="nav-item" onclick="showScreen('screen-user-profile')">
+          <span class="nav-icon">👤</span>
+          <span>Account</span>
+        </button>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: ITEM DETAIL (USER) ================= -->
+    <div id="screen-item-detail" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-catalog')">←</button>
+          <div>
+            <h1>Item Details</h1>
+            <p>Public information about the found item</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div style="width:100%; height:160px; border-radius:16px; background:#8A6047; margin-bottom:16px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">
+          [Public Photo View]
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+          <h2 class="title-h1" style="font-size:20px;">Brown Wallet</h2>
+          <span class="badge badge-stored">Stored</span>
+        </div>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">SR-20261009-1024</p>
+
+        <div class="card">
+          <div class="info-row"><span class="label">Category</span><span class="val">Wallet</span></div>
+          <div class="info-row"><span class="label">Color</span><span class="val">Brown</span></div>
+          <div class="info-row"><span class="label">Found</span><span class="val">Central Library</span></div>
+          <div class="info-row"><span class="label">Date & Time</span><span class="val">9 Oct 2026, 09:15 WIB</span></div>
+        </div>
+
+        <div class="notice-box">
+          <span style="font-size:18px; color:var(--primary-blue);">🛡️</span>
+          <span>Identifying details are kept private. Answer the verification questions to submit a claim. Security staff review all claims before collection.</span>
+        </div>
+
+        <div style="margin-top:auto;">
+          <button class="btn btn-primary" onclick="showScreen('screen-claim-form')">Submit a Claim</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: REPORT A LOST ITEM (STEP 1 - DETAILS) ================= -->
+    <div id="screen-lost-form" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-user-home')" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"/></svg></button>
+          <div>
+            <h1>Report a Lost Item</h1>
+            <p>Report a loss. This does not submit an ownership claim.</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="stepper-container">
+          <div class="step-bar active"></div>
+          <div class="step-bar"></div>
+        </div>
+        <div class="step-labels"><span class="current">Details</span><span>Submit</span></div>
+        <div class="step-count">Step 1 of 2</div>
+
+        <div class="field">
+          <label class="field-label" for="lost-desc">Item Description</label>
+          <textarea class="field-area" id="lost-desc">Brown wallet. Last seen while studying in the library.</textarea>
+        </div>
+
+        <div class="field-row field">
+          <div>
+            <label class="field-label" for="lost-category">Category</label>
+            <select class="field-select" id="lost-category">
+              <option selected>Wallet</option><option>Phone</option><option>Bag</option>
+              <option>Keys</option><option>ID / Cards</option><option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label" for="lost-color">Color</label>
+            <select class="field-select" id="lost-color">
+              <option selected>Brown</option><option>Black</option><option>Blue</option>
+              <option>Red</option><option>White</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="lost-location">Last Known Campus Location</label>
+          <select class="field-select" id="lost-location">
+            <option selected>Central Library</option><option>Main Cafeteria</option>
+            <option>Lecture Hall A</option><option>Parking Area</option><option>Student Center</option>
+          </select>
+        </div>
+
+        <div class="field-row field">
+          <div>
+            <label class="field-label" for="lost-date">Date</label>
+            <input class="field-input" id="lost-date" value="8 Oct 2026">
+          </div>
+          <div>
+            <label class="field-label" for="lost-time">Time</label>
+            <input class="field-input" id="lost-time" value="12:00 WIB">
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="field-label">Item Photo (Optional)</span>
+          <div class="photo-drop" role="button" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h6"/><path d="M4 17l4.500-4.500 3 3L15 12l5 5"/><circle cx="8.500" cy="8.500" r="1.200"/><path d="M18 3v6M15 6h6"/></svg><span>Add Photo</span></div>
+        </div>
+
+        <div style="margin-top:auto; padding-top:12px;">
+          <button class="btn btn-soft" onclick="submitLostReport()">Continue to Submit</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: REPORT A LOST ITEM (STEP 2 - SUBMIT) ================= -->
+    <div id="screen-lost-submit" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-lost-form')" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"/></svg></button>
+          <div>
+            <h1>Report a Lost Item</h1>
+            <p>Report a loss. This does not submit an ownership claim.</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="stepper-container">
+          <div class="step-bar active"></div>
+          <div class="step-bar active"></div>
+        </div>
+        <div class="step-labels"><span>Details</span><span class="current">Submit</span></div>
+        <div class="step-count">Step 2 of 2</div>
+
+        <h3 class="section-title">Review Your Report</h3>
+        <div class="ticket-card">
+          <div class="ticket-row"><span class="k">Description</span><span class="v" id="rev-desc"></span></div>
+          <div class="ticket-row"><span class="k">Category</span><span class="v" id="rev-cat"></span></div>
+          <div class="ticket-row"><span class="k">Color</span><span class="v" id="rev-color"></span></div>
+          <div class="ticket-row"><span class="k">Location</span><span class="v" id="rev-loc"></span></div>
+          <div class="ticket-row"><span class="k">Date &amp; Time</span><span class="v" id="rev-dt"></span></div>
+        </div>
+
+        <div class="info-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 2.5v5.5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V5.5L12 3z"/><path d="M9 12l2.2 2.2L15.5 10"/></svg>
+          <span>Security staff will compare your report with stored found items. You will be notified if a possible match is found.</span>
+        </div>
+
+        <div style="margin-top:auto; display:flex; flex-direction:column; gap:12px;">
+          <button class="btn btn-soft" onclick="confirmLostReport()">Submit Report</button>
+          <button class="btn btn-muted" onclick="showScreen('screen-lost-form')">Edit Details</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: SUBMIT CLAIM ================= -->
+    <div id="screen-claim-form" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-item-detail')" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"/></svg></button>
+          <div>
+            <h1>Submit a Claim</h1>
+            <p>Answer based on your own belongings</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="claim-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-2"/><path d="M21 9h-5a2.5 2.5 0 0 0 0 5h5V9z"/><circle cx="16.5" cy="11.5" r=".6" fill="currentColor"/></svg>
+          <div>
+            <div class="ci-title">Wallet · Brown</div>
+            <div class="ci-sub">SR-20261008-1024</div>
+            <div class="ci-sub" style="margin-top:2px;">Central Library · 8 Oct 2026</div>
+          </div>
+        </div>
+
+        <h3 class="section-title">Ownership Verification</h3>
+
+        <div class="field">
+          <label class="field-label" for="claim-ans-1">What identifying details are inside the wallet?</label>
+          <textarea class="field-area" id="claim-ans-1" placeholder="Enter your answer"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label" for="claim-ans-2">List the wallet contents you can verify.</label>
+          <textarea class="field-area" id="claim-ans-2" placeholder="Enter your answer"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label" for="claim-ans-3">When and where did you last use it?</label>
+          <textarea class="field-area" id="claim-ans-3" placeholder="Enter your answer"></textarea>
+        </div>
+
+        <div class="info-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 2.5v5.5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V5.5L12 3z"/><path d="M9 12l2.2 2.2L15.5 10"/></svg>
+          <span>Up to 3 active claims per account. Answers are used only for verification. Security staff decide whether to approve each claim.</span>
+        </div>
+
+        <div style="margin-top:auto;">
+          <button class="btn btn-soft" onclick="submitUserClaim()">Submit Claim</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: COLLECTION TICKET (OWNER QR) ================= -->
+    <div id="screen-collection-ticket" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-user-home')" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"/></svg></button>
+          <div>
+            <h1>Collection Ticket</h1>
+            <p>Present this ticket when collecting your item</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="ticket-head">
+          <span class="badge-ticket">Claim Approved</span>
+          <h2 class="ticket-title">Wallet · Brown</h2>
+          <p class="ticket-ref">SR-20261008-1024 · Claim KL-1024-01</p>
+        </div>
+
+        <div class="qr-frame" aria-label="Collection QR code">
+          <svg viewBox="110 219 182 182" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+            <path fill-rule="evenodd" clip-rule="evenodd" fill="#111827" d="M198 235H204V241H198V235ZM204 235H210V241H204V235ZM210 235H216V241H210V235ZM174 241H180V247H174V241ZM180 241H186V247H180V241ZM174 247H180V253H174V247ZM180 247H186V253H180V247ZM186 247H192V253H186V247ZM192 247H198V253H192V247ZM198 247H204V253H198V247ZM204 247H210V253H204V247ZM210 247H216V253H210V247ZM216 247H222V253H216V247ZM222 247H228V253H222V247ZM174 253H180V259H174V253ZM222 253H228V259H222V253ZM192 259H198V265H192V259ZM198 259H204V265H198V259ZM204 259H210V265H204V259ZM186 265H192V271H186V265ZM192 265H198V271H192V265ZM210 265H216V271H210V265ZM216 265H222V271H216V265ZM180 271H186V277H180V271ZM198 271H204V277H198V271ZM204 271H210V277H204V271ZM216 271H222V277H216V271ZM222 271H228V277H222V271ZM174 277H180V283H174V277ZM180 277H186V283H180V277ZM192 277H198V283H192V277ZM210 277H216V283H210V277ZM222 277H228V283H222V277ZM138 283H144V289H138V283ZM150 283H156V289H150V283ZM162 283H168V289H162V283ZM174 283H180V289H174V283ZM186 283H192V289H186V283ZM198 283H204V289H198V283ZM216 283H222V289H216V283ZM228 283H234V289H228V283ZM240 283H246V289H240V283ZM252 283H258V289H252V283ZM264 283H270V289H264V283ZM126 289H132V295H126V289ZM138 289H144V295H138V289ZM150 289H156V295H150V289ZM162 289H168V295H162V289ZM174 289H180V295H174V289ZM186 289H192V295H186V289ZM204 289H210V295H204V289ZM216 289H222V295H216V289ZM228 289H234V295H228V289ZM240 289H246V295H240V289ZM252 289H258V295H252V289ZM264 289H270V295H264V289ZM132 295H138V301H132V295ZM144 295H150V301H144V295ZM150 295H156V301H150V295ZM162 295H168V301H162V295ZM180 295H186V301H180V295ZM192 295H198V301H192V295ZM210 295H216V301H210V295ZM222 295H228V301H222V295ZM228 295H234V301H228V295ZM240 295H246V301H240V295ZM258 295H264V301H258V295ZM270 295H276V301H270V295ZM126 301H132V307H126V301ZM144 301H150V307H144V301ZM162 301H168V307H162V301ZM180 301H186V307H180V301ZM186 301H192V307H186V301ZM198 301H204V307H198V301ZM204 301H210V307H204V301ZM222 301H228V307H222V301ZM240 301H246V307H240V301ZM258 301H264V307H258V301ZM264 301H270V307H264V301ZM132 307H138V313H132V307ZM138 307H144V313H138V307ZM162 307H168V313H162V307ZM168 307H174V313H168V307ZM186 307H192V313H186V307ZM192 307H198V313H192V307ZM210 307H216V313H210V307ZM216 307H222V313H216V307ZM240 307H246V313H240V307ZM246 307H252V313H246V307ZM264 307H270V313H264V307ZM270 307H276V313H270V307ZM126 313H132V319H126V313ZM132 313H138V319H132V313ZM156 313H162V319H156V313ZM162 313H168V319H162V313ZM168 313H174V319H168V313ZM198 313H204V319H198V313ZM204 313H210V319H204V313ZM210 313H216V319H210V313ZM234 313H240V319H234V313ZM240 313H246V319H240V313ZM246 313H252V319H246V313ZM150 319H156V325H150V319ZM156 319H162V325H156V319ZM162 319H168V325H162V319ZM168 319H174V325H168V319ZM174 319H180V325H174V319ZM180 319H186V325H180V319ZM228 319H234V325H228V319ZM234 319H240V325H234V319ZM240 319H246V325H240V319ZM246 319H252V325H246V319ZM252 319H258V325H252V319ZM258 319H264V325H258V319ZM126 325H132V331H126V325ZM132 325H138V331H132V325ZM138 325H144V331H138V325ZM144 325H150V331H144V325ZM150 325H156V331H150V325ZM156 325H162V331H156V325ZM162 325H168V331H162V325ZM168 325H174V331H168V325ZM174 325H180V331H174V325ZM180 325H186V331H180V325ZM186 325H192V331H186V325ZM192 325H198V331H192V325ZM198 325H204V331H198V325ZM204 325H210V331H204V325ZM210 325H216V331H210V325ZM216 325H222V331H216V325ZM222 325H228V331H222V325ZM228 325H234V331H228V325ZM234 325H240V331H234V325ZM240 325H246V331H240V325ZM246 325H252V331H246V325ZM252 325H258V331H252V325ZM258 325H264V331H258V325ZM264 325H270V331H264V325ZM270 325H276V331H270V325ZM144 331H150V337H144V331ZM150 331H156V337H150V331ZM156 331H162V337H156V331ZM162 331H168V337H162V331ZM168 331H174V337H168V331ZM174 331H180V337H174V331ZM222 331H228V337H222V331ZM228 331H234V337H228V331ZM234 331H240V337H234V331ZM240 331H246V337H240V331ZM246 331H252V337H246V331ZM252 331H258V337H252V331ZM192 337H198V343H192V337ZM198 337H204V343H198V337ZM204 337H210V343H204V337ZM234 337H240V343H234V337ZM240 337H246V343H240V337ZM246 337H252V343H246V337ZM270 337H276V343H270V337ZM186 343H192V349H186V343ZM192 343H198V349H192V343ZM210 343H216V349H210V343ZM216 343H222V349H216V343ZM234 343H240V349H234V343ZM240 343H246V349H240V343ZM264 343H270V349H264V343ZM270 343H276V349H270V343ZM180 349H186V355H180V349ZM198 349H204V355H198V349ZM204 349H210V355H204V349ZM216 349H222V355H216V349ZM222 349H228V355H222V349ZM240 349H246V355H240V349ZM258 349H264V355H258V349ZM174 355H180V361H174V355ZM180 355H186V361H180V355ZM192 355H198V361H192V355ZM210 355H216V361H210V355ZM222 355H228V361H222V355ZM240 355H246V361H240V355ZM252 355H258V361H252V355ZM258 355H264V361H258V355ZM270 355H276V361H270V355ZM174 361H180V367H174V361ZM186 361H192V367H186V361ZM198 361H204V367H198V361ZM216 361H222V367H216V361ZM228 361H234V367H228V361ZM240 361H246V367H240V361ZM252 361H258V367H252V361ZM264 361H270V367H264V361ZM174 367H180V373H174V367ZM186 367H192V373H186V367ZM204 367H210V373H204V367ZM216 367H222V373H216V367ZM228 367H234V373H228V367ZM240 367H246V373H240V367ZM252 367H258V373H252V367ZM264 367H270V373H264V367ZM180 373H186V379H180V373ZM192 373H198V379H192V373ZM210 373H216V379H210V373ZM222 373H228V379H222V373ZM228 373H234V379H228V373ZM240 373H246V379H240V373ZM258 373H264V379H258V373ZM270 373H276V379H270V373ZM180 379H186V385H180V379ZM186 379H192V385H186V379ZM198 379H204V385H198V379ZM204 379H210V385H204V379ZM222 379H228V385H222V379ZM240 379H246V385H240V379ZM258 379H264V385H258V379ZM264 379H270V385H264V379ZM126 235H168V277H126V235ZM132 241V271H162V241H132ZM138 247H156V265H138V247ZM234 235H276V277H234V235ZM240 241V271H270V241H240ZM246 247H264V265H246V247ZM126 343H168V385H126V343ZM132 349V379H162V349H132ZM138 355H156V373H138V355Z"/>
+          </svg>
+        </div>
+
+        <div class="ticket-card">
+          <div class="ticket-row"><span class="k">Claimant</span><span class="v">Naya</span></div>
+          <div class="ticket-row"><span class="k">Approved</span><span class="v">8 Oct 2026, 15:00 WIB</span></div>
+          <div class="ticket-row"><span class="k">Valid Until</span><span class="v">9 Oct 2026, 15:00 WIB</span></div>
+          <p class="ticket-note">Valid for 24 hours. The collection QR code is linked to this account and claim.</p>
+        </div>
+
+        <h3 class="section-title" style="font-size:16px; margin-bottom:12px;">Bring Your Student ID</h3>
+        <div class="id-card-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="8.5" cy="11" r="1.8"/><path d="M5.8 16c.5-1.3 1.600-1.900 2.700-1.900s2.200.6 2.700 1.900M14 10h4M14 13h3"/></svg>
+          <span>Collect your item at the campus security post. Present this ticket and your student ID for verification.</span>
+        </div>
+
+        <div style="margin-top:auto; padding-top:20px;">
+          <button class="btn btn-soft" onclick="showScreen('screen-user-home')">Back to Home</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: SECURITY PROFILE (GUARD ACCOUNT) ================= -->
+    <div id="screen-guard-profile" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-guard-home')" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"/></svg></button>
+          <div>
+            <h1>Security Profile</h1>
+            <p>Campus Security Account</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="sec-profile-card">
+          <div class="sec-avatar">BS</div>
+          <div>
+            <div class="sp-name">Budi Santoso</div>
+            <span class="role-pill">Security Officer</span>
+            <div class="sp-post">Main Security Post</div>
+          </div>
+        </div>
+
+        <h3 class="section-title">Officer Information</h3>
+        <div class="officer-info">
+          <div class="officer-field"><div class="of-label">Full Name</div><div class="of-value">Budi Santoso</div></div>
+          <div class="officer-field"><div class="of-label">Work Email</div><div class="of-value">budi.santoso@kampus.ac.id</div></div>
+          <div class="officer-field"><div class="of-label">Officer ID</div><div class="of-value">SAT-001</div></div>
+          <div class="officer-field"><div class="of-label">Security Post</div><div class="of-value muted">Main Security Post</div></div>
+        </div>
+
+        <button class="btn btn-signout" onclick="signOut()">Sign Out</button>
+
+        <div class="sec-footer">
+          <strong>SafeReturn</strong>
+          Returning belongings. Supporting our campus.
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: USER PROFILE ================= -->
+    <div id="screen-user-profile" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-user-home')">←</button>
+          <div>
+            <h1>Account</h1>
+            <p>SafeReturn User Profile</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="card" style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+          <div style="width:54px; height:54px; border-radius:50%; background:#E0E7FF; color:var(--primary-blue); display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:18px;">NP</div>
+          <div>
+            <div style="font-weight:700; font-size:16px;">Naya Putri</div>
+            <span class="badge badge-approved" style="margin-top:4px;">Student</span>
+          </div>
+        </div>
+
+        <h3 class="title-h2">Profile Information</h3>
+        <div class="card">
+          <div class="info-row"><span class="label">Full Name</span><span class="val">Naya Putri</span></div>
+          <div class="info-row"><span class="label">Campus Email</span><span class="val">naya.putri@mahasiswa.ac.id</span></div>
+          <div class="info-row"><span class="label">Student ID</span><span class="val">2304101024</span></div>
+        </div>
+
+        <div style="margin-top:auto; display:flex; flex-direction:column; gap:12px;">
+          <button class="btn btn-muted" onclick="showScreen('screen-signin')">Sign Out</button>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="nav-item" onclick="showScreen('screen-user-home')">
+          <span class="nav-icon">🏠</span>
+          <span>Home</span>
+        </button>
+        <button class="nav-item" onclick="showScreen('screen-catalog')">
+          <span class="nav-icon">📦</span>
+          <span>Found Items</span>
+        </button>
+        <button class="nav-item active" onclick="showScreen('screen-user-profile')">
+          <span class="nav-icon">👤</span>
+          <span>Account</span>
+        </button>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: SECURITY HOME (GUARD 01) ================= -->
+    <div id="screen-guard-home" class="screen">
+      <div class="app-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:32px; height:32px; background:var(--primary-blue); border-radius:10px; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:bold;">🛡️</div>
+          <div>
+            <span style="font-size:17px; font-weight:800; color:var(--text-heading);">Safe<span style="color:#D97706;">Return</span></span>
+            <div style="font-size:11px; color:var(--text-secondary);">Security Mode · Campus Security Post</div>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <h1 class="title-h1" style="font-size:22px; margin-bottom:4px;">Welcome, Budi</h1>
+        <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">Friday, 9 October 2026</p>
+
+        <div class="card" style="margin-bottom:20px;">
+          <div class="info-row"><span class="label">Officer</span><span class="val">Budi Santoso</span></div>
+          <div class="info-row"><span class="label">Service Location</span><span class="val">Main Security Post</span></div>
+          <div class="info-row"><span class="label">Shift</span><span class="val">08:00–16:00 WIB</span></div>
+        </div>
+
+        <h2 class="title-h2">Scan to Get Started</h2>
+        <p style="font-size:13px; color:var(--text-secondary); margin-bottom:14px;">Receive an item from its finder or return it to an approved claimant.</p>
+
+        <button class="btn btn-outlined" style="margin-bottom:12px; display:flex; gap:8px;" onclick="showScreen('screen-guard-scan-case')">
+          <span>⛶</span> Receive an Item (Finder)
+        </button>
+
+        <button class="btn btn-muted" style="margin-bottom:16px; display:flex; gap:8px;" onclick="showScreen('screen-guard-scan-owner')">
+          <span>🪪</span> Return an Item (Owner)
+        </button>
+
+        <div class="security-staff-box">
+          <div class="sec-title"><span>🛡️</span> Retake the Photo and Assign a Shelf</div>
+          <p style="font-size:12px; color:var(--text-secondary); line-height:1.4;">Confirm the category and shelf number before storing the item in the secure locker.</p>
+        </div>
+      </div>
+
+      <!-- Guard Bottom Nav (4 Tabs) -->
+      <div class="bottom-nav">
+        <button class="nav-item active" onclick="showScreen('screen-guard-home')">
+          <span class="nav-icon">⛶</span>
+          <span>Scan</span>
+        </button>
+        <button class="nav-item" onclick="showScreen('screen-guard-inventory')">
+          <span class="nav-icon">🗄️</span>
+          <span>Inventory</span>
+        </button>
+        <button class="nav-item" onclick="showScreen('screen-guard-claims')">
+          <span class="nav-icon">📋</span>
+          <span>Claims</span>
+        </button>
+        <button class="nav-item" onclick="showScreen('screen-guard-profile')">
+          <span class="nav-icon">👤</span>
+          <span>Account</span>
+        </button>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: GUARD SCAN CASE QR (02) ================= -->
+    <div id="screen-guard-scan-case" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-guard-home')">←</button>
+          <div>
+            <h1>Scan QR Code</h1>
+            <p>Item Intake · From Finder</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad" style="align-items:center; text-align:center;">
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:16px; width:100%; text-align:left;">Step 1 of 3 · Scan and Confirm</div>
+
+        <div class="qr-card" style="width:100%; height:260px; background:#F8FAFC; border:2px dashed var(--primary-blue); justify-content:center;">
+          <div style="font-size:40px; color:var(--primary-blue); margin-bottom:8px;">⛶</div>
+          <strong style="color:var(--primary-blue);">Camera Scanner Active</strong>
+          <span style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Position the finder's case QR within the frame</span>
+        </div>
+
+        <div class="notice-box" style="text-align:left; width:100%;">
+          <span>🛡️</span>
+          <div>
+            <strong style="color:var(--text-heading); font-size:13px;">Receive the Physical Item First</strong>
+            <p style="margin-top:2px;">After scanning, compare the item with the report photo and details.</p>
+          </div>
+        </div>
+
+        <div style="margin-top:auto; width:100%;">
+          <button class="btn btn-primary" onclick="showScreen('screen-guard-confirm-item')">Simulate Scan: SR-20261009-1024</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: GUARD CONFIRM ITEM (03) ================= -->
+    <div id="screen-guard-confirm-item" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-guard-scan-case')">←</button>
+          <div>
+            <h1>Confirm Item</h1>
+            <p>Case QR code scanned successfully</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Step 1 of 3 · Scan and Confirm</div>
+        <span class="badge badge-reported" style="margin-bottom:12px; align-self:flex-start;">Reported</span>
+
+        <div style="width:100%; height:140px; border-radius:14px; background:#8A6047; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; margin-bottom:12px;">
+          [Finder's Photo: Brown Wallet]
+        </div>
+
+        <h2 class="title-h1" style="font-size:18px;">Brown Wallet</h2>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">SR-20261009-1024</p>
+
+        <div class="card">
+          <div class="info-row"><span class="label">Category</span><span class="val">Wallet</span></div>
+          <div class="info-row"><span class="label">Color</span><span class="val">Brown</span></div>
+          <div class="info-row"><span class="label">Found Location</span><span class="val">Central Library</span></div>
+          <div class="info-row"><span class="label">Reported By</span><span class="val">Dimas Pratama</span></div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px; margin:14px 0;">
+          <input type="checkbox" id="check-item-match" style="width:20px; height:20px;" checked>
+          <label for="check-item-match" style="font-size:13px; font-weight:600; color:var(--text-heading);">The physical item matches the report</label>
+        </div>
+
+        <div style="margin-top:auto;">
+          <button class="btn btn-primary" onclick="showScreen('screen-guard-shelf-assign')">Continue to Storage</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: GUARD SHELF ASSIGNMENT (04) ================= -->
+    <div id="screen-guard-shelf-assign" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-guard-confirm-item')">←</button>
+          <div>
+            <h1>Photo and Shelf Assignment</h1>
+            <p>SR-20261009-1024</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Step 2 of 3 · Retake Photo and Assign Shelf</div>
+
+        <div style="width:100%; height:130px; border-radius:14px; background:#694634; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; margin-bottom:6px;">
+          📷 Official Security Photo Saved
+        </div>
+        <span style="font-size:12px; color:var(--primary-blue); font-weight:600; margin-bottom:14px;">Retake / Upload Photo</span>
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select">
+            <option>Wallet</option>
+            <option>Electronics</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Shelf Number *</label>
+          <input class="form-input" id="guard-shelf-num" value="A-03">
+        </div>
+
+        <div class="security-staff-box">
+          <div class="sec-title"><span>🔒</span> Security Staff Only (Secret Identifying Details)</div>
+          <p style="font-size:12px; color:var(--text-secondary);">Cream stitching inside, three card slots; a library card in Naya Putri's name.</p>
+        </div>
+
+        <div style="margin-top:auto;">
+          <button class="btn btn-primary" onclick="saveItemToShelf()">Save Item</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: GUARD ITEM STORED (05) ================= -->
+    <div id="screen-guard-item-stored" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-guard-home')">←</button>
+          <div>
+            <h1>Item Stored</h1>
+            <p>Item Intake Receipt</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad" style="align-items:center; text-align:center;">
+        <div style="width:56px; height:56px; border-radius:50%; background:var(--status-green-bg); color:var(--status-green); font-size:26px; display:flex; align-items:center; justify-content:center; margin:16px 0 10px;">✓</div>
+        <h2 style="font-size:18px; font-weight:800; margin-bottom:4px;">Item Received Successfully</h2>
+        <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">The new photo and storage location have been recorded.</p>
+
+        <div class="card" style="width:100%; text-align:left;">
+          <span class="badge badge-stored" style="margin-bottom:8px;">Stored</span>
+          <h3 style="font-size:16px; font-weight:700; margin-bottom:4px;">Brown Wallet</h3>
+          <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">SR-20261009-1024</p>
+          <div class="info-row"><span class="label">Category</span><span class="val">Wallet</span></div>
+          <div class="info-row"><span class="label">Shelf Number</span><span class="val" id="stored-shelf-val">A-03</span></div>
+          <div class="info-row"><span class="label">Received By</span><span class="val">Budi Santoso</span></div>
+          <div class="info-row"><span class="label">Received At</span><span class="val">9 October 2026, 09:32 WIB</span></div>
+        </div>
+
+        <div style="margin-top:auto; width:100%;">
+          <button class="btn btn-primary" onclick="showScreen('screen-guard-inventory')">Back to Inventory</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: GUARD INVENTORY LIST (06) ================= -->
+    <div id="screen-guard-inventory" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-guard-home')">←</button>
+          <div>
+            <h1>Inventory</h1>
+            <p>Main Security Post · Stored Items</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <input class="form-input" placeholder="Search by case code..." style="margin-bottom:12px;">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span style="font-size:12px; color:var(--text-secondary);">4 items in lockers</span>
+          <button class="btn btn-muted" style="width:auto; height:32px; padding:0 12px; font-size:12px;" onclick="openFilterSheet()">Filters ⚙️</button>
+        </div>
+
+        <div class="item-card" onclick="showScreen('screen-guard-claims')">
+          <div class="item-thumb brown-wallet">Wallet</div>
+          <div style="flex:1;">
+            <div style="font-weight:700; font-size:15px;">Brown Wallet</div>
+            <div style="font-size:12px; color:var(--text-secondary);">Wallet · Shelf A-03</div>
+            <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">9 Oct 2026 · 09:32 WIB</div>
+          </div>
+          <span class="badge badge-stored">Stored</span>
+        </div>
+
+        <div class="item-card">
+          <div class="item-thumb" style="background:#0F172A; color:white;">Wallet</div>
+          <div style="flex:1;">
+            <div style="font-weight:700; font-size:15px;">Black Wallet</div>
+            <div style="font-size:12px; color:var(--text-secondary);">Wallet · Shelf A-02</div>
+            <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">8 Oct 2026 · 14:20 WIB</div>
+          </div>
+          <span class="badge badge-matched">Matched</span>
+        </div>
+
+        <div class="item-card">
+          <div class="item-thumb" style="background:#CBD5E1;">Umbrella</div>
+          <div style="flex:1;">
+            <div style="font-weight:700; font-size:15px;">Blue Umbrella</div>
+            <div style="font-size:12px; color:var(--text-secondary);">Umbrella · Shelf B-01</div>
+            <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">9 Oct 2026 · 10:05 WIB</div>
+          </div>
+          <span class="badge badge-stored">Stored</span>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="nav-item" onclick="showScreen('screen-guard-home')"><span class="nav-icon">⛶</span><span>Scan</span></button>
+        <button class="nav-item active" onclick="showScreen('screen-guard-inventory')"><span class="nav-icon">🗄️</span><span>Inventory</span></button>
+        <button class="nav-item" onclick="showScreen('screen-guard-claims')"><span class="nav-icon">📋</span><span>Claims</span></button>
+        <button class="nav-item" onclick="showScreen('screen-guard-profile')"><span class="nav-icon">👤</span><span>Account</span></button>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: GUARD CLAIMS QUEUE (09) ================= -->
+    <div id="screen-guard-claims" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-guard-home')">←</button>
+          <div>
+            <h1>Claim Queue</h1>
+            <p>Claims awaiting security review</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="notice-box">
+          <span>ℹ️</span>
+          <span>Matches are suggestions only. Compare the answers with identifying details before deciding.</span>
+        </div>
+
+        <!-- AI Match Candidate Card -->
+        <div class="item-card" style="flex-direction:column; align-items:stretch; gap:10px;" onclick="showScreen('screen-guard-ai-match')">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="badge badge-reported" style="background:#E0E7FF; color:var(--primary-blue);">AI Match Found</span>
+            <span style="font-size:12px; font-weight:700; color:var(--primary-blue);">92% Match ›</span>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div class="item-thumb brown-wallet">Wallet</div>
+            <div>
+              <div style="font-weight:700; font-size:15px;">Brown Wallet (Naya Putri)</div>
+              <div style="font-size:12px; color:var(--text-secondary);">Lost: Central Library reading room</div>
+              <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">Submitted: 9 Oct 2026, 09:00 WIB</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending Review Card -->
+        <div class="item-card" style="flex-direction:column; align-items:stretch; gap:10px;" onclick="showScreen('screen-guard-claim-review')">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="badge badge-reported">Pending Review</span>
+            <span style="font-size:12px; color:var(--text-secondary);">Manual Review ›</span>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div class="item-thumb" style="background:#0F172A; color:white;">Wallet</div>
+            <div>
+              <div style="font-weight:700; font-size:15px;">Black Wallet (Raka Pradana)</div>
+              <div style="font-size:12px; color:var(--text-secondary);">SR-20261008-0891 · Shelf A-02</div>
+              <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">Submitted: 9 Oct 2026, 10:00 WIB</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="nav-item" onclick="showScreen('screen-guard-home')"><span class="nav-icon">⛶</span><span>Scan</span></button>
+        <button class="nav-item" onclick="showScreen('screen-guard-inventory')"><span class="nav-icon">🗄️</span><span>Inventory</span></button>
+        <button class="nav-item active" onclick="showScreen('screen-guard-claims')"><span class="nav-icon">📋</span><span>Claims</span></button>
+        <button class="nav-item" onclick="showScreen('screen-guard-profile')"><span class="nav-icon">👤</span><span>Account</span></button>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: GUARD AI MATCH RESULTS (25) ================= -->
+    <div id="screen-guard-ai-match" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-guard-claims')">←</button>
+          <div>
+            <h1>AI Match Results</h1>
+            <p>From Claim Queue · Naya Putri</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="card" style="background:#EFF6FF; border:1px solid #BFDBFE;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:32px; font-weight:800; color:var(--primary-blue);">92%</span>
+            <span class="badge badge-reported">Requires review</span>
+          </div>
+          <strong style="color:var(--text-heading); font-size:14px;">High similarity</strong>
+          <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">Illustrative similarity score, not ownership probability.</p>
+        </div>
+
+        <h3 class="title-h2">Report Comparison</h3>
+        <div class="card">
+          <div class="info-row"><span class="label">Category</span><span class="val">Wallet (Same)</span></div>
+          <div class="info-row"><span class="label">Color</span><span class="val">Brown (Same)</span></div>
+          <div class="info-row"><span class="label">Location</span><span class="val">Central Library (Nearby)</span></div>
+          <div class="info-row"><span class="label">Time</span><span class="val">15 min apart</span></div>
+        </div>
+
+        <div style="margin-top:auto;">
+          <button class="btn btn-primary" onclick="showScreen('screen-guard-claim-review')">Review Claim</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: GUARD CLAIM REVIEW (10) ================= -->
+    <div id="screen-guard-claim-review" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-guard-claims')">←</button>
+          <div>
+            <h1>Claim Review</h1>
+            <p>Security Mode · Manual Review</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <span class="badge badge-reported" style="align-self:flex-start; margin-bottom:8px;">Pending Review</span>
+        <h2 style="font-size:17px; font-weight:800;">Brown Wallet · Shelf A-03</h2>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">SR-20261009-1024 · Claim KL-1024-01</p>
+
+        <div class="card">
+          <div class="info-row"><span class="label">Claimant</span><span class="val">Naya Putri</span></div>
+          <div class="info-row"><span class="label">Student ID</span><span class="val">2304101024</span></div>
+          <div class="info-row"><span class="label">Submitted</span><span class="val">9 October 2026, 09:00 WIB</span></div>
+        </div>
+
+        <div class="security-staff-box">
+          <div class="sec-title"><span>🔒</span> Security Staff Only (Recorded Truth)</div>
+          <p style="font-size:12px; color:var(--text-secondary);">Cream stitching inside, three card slots; a library card in Naya Putri's name.</p>
+        </div>
+
+        <div class="card" style="border:1px solid #CBD5E1;">
+          <strong style="font-size:13px; color:var(--text-heading);">Claimant's Submitted Answers:</strong>
+          <p style="font-size:12px; color:var(--text-primary); margin-top:6px;">"Cream stitching inside, three card slots; library card in Naya Putri's name"</p>
+        </div>
+
+        <div style="margin-top:auto; display:flex; flex-direction:column; gap:10px;">
+          <button class="btn btn-primary" onclick="guardApproveClaim()">Approve Claim</button>
+          <button class="btn btn-danger" onclick="openRejectionSheet()">Reject Claim</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: GUARD SCAN OWNER QR (12) ================= -->
+    <div id="screen-guard-scan-owner" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-guard-home')">←</button>
+          <div>
+            <h1>Scan Owner's QR Code</h1>
+            <p>Item Handover · Collection Ticket</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad" style="align-items:center; text-align:center;">
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:16px; width:100%; text-align:left;">Step 1 of 3 · Scan the Owner's Ticket</div>
+
+        <div class="qr-card" style="width:100%; height:260px; background:#F8FAFC; border:2px dashed #0F766E; justify-content:center;">
+          <div style="font-size:40px; color:#0F766E; margin-bottom:8px;">⛶</div>
+          <strong style="color:#0F766E;">Owner Ticket Scanner Active</strong>
+          <span style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Scan the ticket from approved claimant</span>
+        </div>
+
+        <div class="notice-box" style="text-align:left; width:100%;">
+          <span>🛡️</span>
+          <span>Ask the owner to open their approved collection ticket, not the finder's report QR code.</span>
+        </div>
+
+        <div style="margin-top:auto; width:100%;">
+          <button class="btn btn-primary" onclick="showScreen('screen-guard-verify-id')">Simulate Scan Ticket: KL-1024-01</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: GUARD VERIFY STUDENT ID (13) ================= -->
+    <div id="screen-guard-verify-id" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-guard-scan-owner')">←</button>
+          <div>
+            <h1>Verify Student ID</h1>
+            <p>Owner QR code scanned successfully</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Step 2 of 3 · Verify Identity</div>
+        <span class="badge badge-approved" style="margin-bottom:12px; align-self:flex-start;">Claim Approved</span>
+
+        <div class="card">
+          <strong style="font-size:14px;">Owner Identity</strong>
+          <div class="info-row"><span class="label">Name</span><span class="val">Naya Putri</span></div>
+          <div class="info-row"><span class="label">Student ID (KTM)</span><span class="val">2304101024</span></div>
+          <div class="info-row"><span class="label">Claim Ticket</span><span class="val">KL-1024-01</span></div>
+          <div class="info-row"><span class="label">Stored Shelf</span><span class="val">Shelf A-03</span></div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px; margin:16px 0;">
+          <input type="checkbox" id="check-ktm" style="width:20px; height:20px;" checked>
+          <label for="check-ktm" style="font-size:13px; font-weight:600; color:var(--text-heading);">The student ID matches the owner's identity</label>
+        </div>
+
+        <div style="margin-top:auto;">
+          <button class="btn btn-primary" onclick="showScreen('screen-guard-evidence-photo')">Continue to Evidence Photo</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: GUARD EVIDENCE PHOTO (14) ================= -->
+    <div id="screen-guard-evidence-photo" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-guard-verify-id')">←</button>
+          <div>
+            <h1>Evidence Photo</h1>
+            <p>Record the item handover</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Step 3 of 3 · Photograph and Complete</div>
+
+        <div style="width:100%; height:180px; border-radius:14px; background:#334155; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; margin-bottom:8px;">
+          📸 Handover Proof Photo Recorded
+        </div>
+        <span class="badge badge-approved" style="align-self:flex-start; margin-bottom:14px;">Student ID Verified</span>
+
+        <div class="card">
+          <div class="info-row"><span class="label">Case Code</span><span class="val">SR-20261009-1024</span></div>
+          <div class="info-row"><span class="label">Item</span><span class="val">Brown Wallet</span></div>
+          <div class="info-row"><span class="label">Owner</span><span class="val">Naya Putri · 2304101024</span></div>
+          <div class="info-row"><span class="label">Officer</span><span class="val">Budi Santoso</span></div>
+        </div>
+
+        <div style="margin-top:auto;">
+          <button class="btn btn-primary" onclick="guardCompleteHandover()">Complete Handover</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: GUARD COMPLETE (15) ================= -->
+    <div id="screen-guard-complete" class="screen">
+      <div class="app-header">
+        <div class="header-left">
+          <button class="back-btn" onclick="showScreen('screen-guard-home')">←</button>
+          <div>
+            <h1>Handover Complete</h1>
+            <p>Item Return Receipt</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-pad" style="align-items:center; text-align:center;">
+        <div style="width:56px; height:56px; border-radius:50%; background:var(--status-green-bg); color:var(--status-green); font-size:26px; display:flex; align-items:center; justify-content:center; margin:16px 0 10px;">✓</div>
+        <h2 style="font-size:18px; font-weight:800; margin-bottom:4px;">Item Returned to Its Owner</h2>
+        <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">Handover recorded on 9 October 2026.</p>
+
+        <div class="card" style="width:100%; text-align:left;">
+          <span class="badge badge-approved" style="margin-bottom:8px;">Returned</span>
+          <h3 style="font-size:16px; font-weight:700; margin-bottom:4px;">Brown Wallet</h3>
+          <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">SR-20261009-1024</p>
+          <div class="info-row"><span class="label">Owner</span><span class="val">Naya Putri</span></div>
+          <div class="info-row"><span class="label">Officer</span><span class="val">Budi Santoso</span></div>
+          <div class="info-row"><span class="label">Completed At</span><span class="val">9 October 2026, 11:05 WIB</span></div>
+        </div>
+
+        <div class="notice-box" style="text-align:left; width:100%;">
+          <span>🔒</span>
+          <span><strong>Item Removed from Shelf A-03</strong><br>Storage and handover history are retained as read-only records in supervisor audit log.</span>
+        </div>
+
+        <div style="margin-top:auto; width:100%;">
+          <button class="btn btn-primary" onclick="showScreen('screen-guard-home')">Back to Scan</button>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= SCREEN: SUPERVISOR AUDIT TRAIL ================= -->
+    <div id="screen-supervisor" class="screen">
+      <div class="app-header">
+        <div>
+          <h1>Supervisor Audit Log</h1>
+          <p>Read-Only Campus Oversight</p>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="card" style="background:#0F172A; color:white;">
+          <div style="font-size:12px; color:#94A3B8;">System Overview</div>
+          <div style="display:flex; justify-content:space-between; margin-top:8px;">
+            <div><span style="font-size:20px; font-weight:bold;">12</span><br><span style="font-size:11px; color:#94A3B8;">Total Intake</span></div>
+            <div><span style="font-size:20px; font-weight:bold;">8</span><br><span style="font-size:11px; color:#94A3B8;">Returned</span></div>
+            <div><span style="font-size:20px; font-weight:bold;">4</span><br><span style="font-size:11px; color:#94A3B8;">In Lockers</span></div>
+          </div>
+        </div>
+
+        <h3 class="title-h2">Chain of Custody Logs</h3>
+        <div id="audit-log-list" style="display:flex; flex-direction:column; gap:10px;">
+          <div class="card" style="margin-bottom:0;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-secondary); margin-bottom:4px;">
+              <span>9 Oct 2026, 11:05 WIB</span>
+              <span class="badge badge-approved">HANDOVER</span>
+            </div>
+            <strong>Brown Wallet (SR-20261009-1024)</strong>
+            <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">Released from Shelf A-03 to Naya Putri (KTM: 2304101024). Officer: Budi Santoso.</p>
+          </div>
+          <div class="card" style="margin-bottom:0;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-secondary); margin-bottom:4px;">
+              <span>9 Oct 2026, 09:32 WIB</span>
+              <span class="badge badge-stored">INTAKE</span>
+            </div>
+            <strong>Brown Wallet (SR-20261009-1024)</strong>
+            <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">Received from Dimas Pratama. Assigned to Shelf A-03. Photo verified.</p>
+          </div>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- ================= BOTTOM SHEET: REJECTION MODAL (11) ================= -->
+    <div id="sheet-rejection" class="sheet-overlay">
+      <div class="sheet-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h2 style="font-size:18px; font-weight:800;">Reject This Claim?</h2>
+          <button style="background:none; border:none; font-size:18px; cursor:pointer;" onclick="closeRejectionSheet()">✕</button>
+        </div>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">SR-20261008-0891 · Raka Pradana</p>
+        <span class="badge badge-danger" style="margin-bottom:14px;">Confirm Rejection</span>
+
+        <div class="form-group">
+          <label class="form-label">Reason *</label>
+          <textarea class="form-textarea" id="rejection-reason" placeholder="Explain why the claim is rejected...">The interior details and contents do not match the stored wallet.</textarea>
+        </div>
+
+        <p style="font-size:11px; color:var(--text-secondary); margin-bottom:16px;">The reason will be sent to the claimant. The item remains stored on shelf A-02.</p>
+
+        <button class="btn btn-primary" style="margin-bottom:8px;" onclick="confirmClaimRejection()">Reject Claim</button>
+        <button class="btn btn-muted" onclick="closeRejectionSheet()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- ================= BOTTOM SHEET: FILTER MODAL (07) ================= -->
+    <div id="sheet-filter" class="sheet-overlay">
+      <div class="sheet-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h2 style="font-size:18px; font-weight:800;">Filter Inventory</h2>
+          <button style="background:none; border:none; font-size:18px; cursor:pointer;" onclick="closeFilterSheet()">✕</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select">
+            <option>All Categories</option>
+            <option selected>Wallet</option>
+            <option>Electronics</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Shelf Number</label>
+          <select class="form-select">
+            <option>All Shelves</option>
+            <option selected>A-03</option>
+            <option>A-02</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Item Status</label>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="badge badge-stored">Stored</span>
+            <span class="badge badge-reported" style="background:#F1F5F9; color:#475569;">Matched</span>
+            <span class="badge badge-reported" style="background:#F1F5F9; color:#475569;">Returned</span>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
+          <button class="btn btn-primary" onclick="closeFilterSheet()">Apply Filters</button>
+          <button class="btn btn-muted" onclick="closeFilterSheet()">Reset Filters</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(screenId);
+      if (target) {
+        target.classList.add('active');
+        target.scrollTop = 0;
+      }
+    }
+
+    function switchRole(role) {
+      document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      if (role === 'guest') showScreen('screen-signin');
+      if (role === 'user') showScreen('screen-user-home');
+      if (role === 'guard') showScreen('screen-guard-home');
+      if (role === 'supervisor') showScreen('screen-supervisor');
+    }
+
+    function signOut() {
+      document.querySelectorAll('.role-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+      showScreen('screen-signin');
+    }
+
+    function saveItemToShelf() {
+      const shelf = document.getElementById('guard-shelf-num').value || 'A-03';
+      document.getElementById('stored-shelf-val').innerText = shelf;
+      showScreen('screen-guard-item-stored');
+    }
+
+    function submitLostReport() {
+      const v = id => document.getElementById(id).value.trim();
+      if (!v('lost-desc')) { alert('Mohon isi deskripsi barang yang hilang.'); return; }
+      document.getElementById('rev-desc').innerText = v('lost-desc');
+      document.getElementById('rev-cat').innerText = v('lost-category');
+      document.getElementById('rev-color').innerText = v('lost-color');
+      document.getElementById('rev-loc').innerText = v('lost-location');
+      document.getElementById('rev-dt').innerText = v('lost-date') + ', ' + v('lost-time');
+      showScreen('screen-lost-submit');
+    }
+
+    function confirmLostReport() {
+      alert('Laporan barang hilang Anda telah dikirim ke pos satpam. Ini bukan klaim kepemilikan.');
+      showScreen('screen-user-home');
+    }
+
+    function submitUserClaim() {
+      alert('Klaim kepemilikan Anda telah dikirim. (Simulasi: satpam menyetujui klaim, tiket pengambilan diterbitkan.)');
+      showScreen('screen-collection-ticket');
+    }
+
+    function guardApproveClaim() {
+      alert('Klaim disetujui! Tiket pengambilan QR 24 jam telah diterbitkan untuk Naya Putri.');
+      showScreen('screen-guard-claims');
+    }
+
+    function openRejectionSheet() {
+      document.getElementById('sheet-rejection').classList.add('active');
+    }
+
+    function closeRejectionSheet() {
+      document.getElementById('sheet-rejection').classList.remove('active');
+    }
+
+    function confirmClaimRejection() {
+      const reason = document.getElementById('rejection-reason').value;
+      closeRejectionSheet();
+      alert('Klaim ditolak dengan alasan: ' + reason);
+      showScreen('screen-guard-claims');
+    }
+
+    function guardCompleteHandover() {
+      showScreen('screen-guard-complete');
+    }
+
+    function openFilterSheet() {
+      document.getElementById('sheet-filter').classList.add('active');
+    }
+
+    function closeFilterSheet() {
+      document.getElementById('sheet-filter').classList.remove('active');
+    }
+  </script>
+</body>
+</html>
